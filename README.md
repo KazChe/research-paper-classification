@@ -114,3 +114,67 @@ This multi dimensional classification would be more useful because?:
 1. more-better (new word) reflects how researchers actually approach and use these papers
 2. It makes it easier to identify related methodologies across different biological systems
 3. Helps identify potential collaborations or cross-pollination :) of techniques
+
+
+
+### Graph Model
+
+
+```cypher
+// Core elements we identified:
+1. Paper (node)
+2. Method (nodes: Biophysical Modeling, Experimental Studies, etc.)
+3. Scale (nodes: Molecular, Cellular, Tissue)
+4. Focus (nodes: Mechanobiology, Tissue Mechanics, etc.)
+5. TechnicalAspect (nodes: Force Measurements, etc.)
+6. Application (nodes: Basic Research, Wound Healing, etc.)
+```
+
+For semantic search, the embeddings could reside in:
+
+The Paper node properties where we store:
+
+```
+Abstract embedding
+Full text embedding
+Title embedding
+```
+
+This way when a user searches,, we compare their query embedding against these different text components
+
+
+Each categorical node (Method, Scale, Focus etc etc) could also have embeddings of their **descriptions/definitions**, allowing users to find relevant categories even if they use different terminology
+
+example cyphers 
+
+```cypher
+CREATE (p:Paper {
+    id: "2412.13040v1",
+    title: "Interplay of damage and repair...",
+    abstract_embedding: [...],  // Vector for abstract
+    fulltext_embedding: [...],  // Vector for full paper
+    title_embedding: [...]      // Vector for title
+})
+
+CREATE (mb:Focus {
+    name: "Mechanobiology",
+    description: "Study of mechanical forces in biological systems",
+    description_embedding: [...]  // Vector for category description
+})
+
+CREATE ()
+```
+
+I think this is worth pursuing further
+
+**rough outline of the ingestion process**
+
+for each paper we extract and vectorize its
+
+- Abstract embedding
+- Full text embedding
+- Title embedding
+
+then generate the Cypher queries for creating the (p:Paper) adding the embeddings of abstract, fulltext, title then various dimension nodes with their own embedings (?storage space!!!) and relationships - see cyphers above
+
+move to the next paper
