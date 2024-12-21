@@ -145,29 +145,8 @@ This way when a user searches,, we compare their query embedding against these d
 
 Each categorical node (Method, Scale, Focus etc etc) could also have embeddings of their **descriptions/definitions**, allowing users to find relevant categories even if they use different terminology
 
-example cyphers 
 
-```cypher
-CREATE (p:Paper {
-    id: "2412.13040v1",
-    title: "Interplay of damage and repair...",
-    abstract_embedding: [...],  // Vector for abstract
-    fulltext_embedding: [...],  // Vector for full paper
-    title_embedding: [...]      // Vector for title
-})
-
-CREATE (mb:Focus {
-    name: "Mechanobiology",
-    description: "Study of mechanical forces in biological systems",
-    description_embedding: [...]  // Vector for category description
-})
-
-CREATE ()
-```
-
-I think this is worth pursuing further
-
-**rough outline of the ingestion process**
+**rough outline of the ingestion process and cyphers to populate the graph**
 
 for each paper we extract and vectorize its
 
@@ -177,4 +156,100 @@ for each paper we extract and vectorize its
 
 then generate the Cypher queries for creating the (p:Paper) adding the embeddings of abstract, fulltext, title then various dimension nodes with their own embedings (?storage space!!!) and relationships - see cyphers above
 
-move to the next paper
+move to the next research paper, this is depicted by Cypher queries below:
+
+---
+
+```cypher
+// First create the Paper node with its embeddings
+CREATE (p:Paper {
+    title: "Interplay of damage and repair in the control of epithelial tissue integrity in response to cyclic loading",
+    authors: ["Eleni Papafilippou", "Lucia Baldauf", "Guillaume Charras", "Alexandre J. Kabla", "Aessandra Bonfanti"],
+    year: 2024,
+    title_embedding: [...],      // Vector here
+    abstract_embedding: [...],   // Vector here
+    fulltext_embedding: [...]    // and Vector here
+})
+
+// the dimensionalities, Smokey
+
+//Create Method nodes and relationships
+MERGE (m1:Method {
+    name: "Biophysical Modeling",
+    description: "Mathematical and physical models applied to biological systems",
+    description_embedding: [...]  // Vector here
+})
+MERGE (m2:Method {
+    name: "Experimental Studies",
+    description: "Research conducted through direct manipulation and observation",
+    description_embedding: [...]  // Vector here
+})
+CREATE (p)-[:USES_METHOD]->(m1)
+CREATE (p)-[:USES_METHOD]->(m2)
+
+// Create Scale nodes and relationships
+MERGE (s1:Scale {
+    name: "Molecular",
+    description: "Investigation at the level of individual molecules and their interactions",
+    description_embedding: [...]  // Vector here
+})
+MERGE (s2:Scale {
+    name: "Cellular",
+    description: "Studies focused on cell-level processes and behaviors",
+    description_embedding: [...]  //vector here
+})
+MERGE (s3:Scale {
+    name: "Tissue",
+    description: "Analysis of collective cell behavior and tissue-level properties",
+    description_embedding: [...]  // Vector here
+})
+CREATE (p)-[:INVESTIGATES_AT_SCALE]->(s1)
+CREATE (p)-[:INVESTIGATES_AT_SCALE]->(s2)
+CREATE (p)-[:INVESTIGATES_AT_SCALE]->(s3)
+
+// Create Focus nodes and relationships
+MERGE (f1:Focus {
+    name: "Mechanobiology",
+    description: "Study of how physical forces influence biological systems",
+    description_embedding: [...]  // Vector here
+})
+MERGE (f2:Focus {
+    name: "Tissue Mechanics",
+    description: "Study of mechanical properties and behavior of biological tissues",
+    description_embedding: [...]  // Vector here
+})
+CREATE (p)-[:HAS_FOCUS]->(f1)
+CREATE (p)-[:HAS_FOCUS]->(f2)
+
+// Create TechnicalAspect nodes and relationships
+MERGE (t1:TechnicalAspect {
+    name: "Force Measurements",
+    description: "Techniques for quantifying mechanical forces in biological systems",
+    description_embedding: [...]  // Vector here
+})
+MERGE (t2:TechnicalAspect {
+    name: "Mechanical Characterization",
+    description: "Methods to analyze mechanical properties of biological materials",
+    description_embedding: [...]  // Vector here
+})
+CREATE (p)-[:INVOLVES_TECHNIQUE]->(t1)
+CREATE (p)-[:INVOLVES_TECHNIQUE]->(t2)
+
+// Create Application nodes and relationships
+MERGE (a1:Application {
+    name: "Basic Research",
+    description: "Fundamental scientific investigation to advance understanding",
+    description_embedding: [...]  // Vector here
+})
+MERGE (a2:Application {
+    name: "Tissue Engineering",
+    description: "Development of biological substitutes to restore tissue function",
+    description_embedding: [...]  // Vector here
+})
+CREATE (p)-[:HAS_APPLICATION]->(a1)
+CREATE (p)-[:HAS_APPLICATION]->(a2)
+```
+
+---
+
+test this all out...
